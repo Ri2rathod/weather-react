@@ -1,17 +1,29 @@
 import React,{useEffect, useState} from "react";
 
 function App() {
-    const [city,setCity]=useState('Bilimora,Gujarat');
-    const [search,setSearch]=useState('Mumbai');
+    const [city,setCity]=useState('null');
+    const [weather,setweather]=useState('null');
+    const [wind,setwind]=useState('null');
+    const [search,setSearch]=useState('pune');
     useEffect(  ()=>{
         const fetchApi = async()=>{
-            const url=`http://api.openweathermap.org/data/2.5/weather?q=${search}&appid=8b202f75161139405a432d8d4f150a1b`;
+            const url=`http://api.openweathermap.org/data/2.5/weather?q=${search}&units=metric&appid=8b202f75161139405a432d8d4f150a1b`;
             const responce=await fetch(url);
-            const resJson=responce.json();
-            console.log(resJson);
+            const resjson =await responce.json();
+            // console.log(resJson);
+            setCity(resjson.main);
+            // if (resjson.weather[0]==null) {
+              try {
+                setweather(resjson.weather[0]);
+                setwind(resjson.wind);
+              } catch (error) {
+                  console.log(error);
+              }
+             
+            // }
         }
         fetchApi();
-    })
+    },[search])
   return (
     <div className="App">
 
@@ -32,7 +44,7 @@ function App() {
               </li>
             </ul>
             <form className="d-flex ml-auto">
-                <input className="form-control me-2" type="search" placeholder="Enter City Name"  aria-label="Search"/>
+                <input className="form-control me-2" type="search" placeholder="Enter City Name" onChange={ (event)=>{setSearch(event.target.value)}}  aria-label="Search"/>
                 <button className="btn btn-outline-success" type="submit">Search</button>
             </form>
           </div>
@@ -43,15 +55,21 @@ function App() {
         <div className="row">
             <div className="col-12 col-sm-8 col-md-6 bg-dark mx-auto weather_card">
                 <div className="container-fluid ">
+                  {!city ?(
+                    <h1>No Data Found</h1>
+                  ):(
+
+                  <div>
                     <div className="header py-5">
-                        <h1 className="display-6 text-white text-center">{city}</h1>
-                        <h4 className=" text-white text-center">Haze Sunshine</h4>
+                        <h1 className="display-6 text-white text-center">{search}</h1>
+                        <h4 className=" text-white text-center">{weather.main}</h4>
                         <div className="d-flex text-center py-3 justify-content-center">
                             <i className="fas fa-sun text-white fa-7x px-2"></i>
-                            <h1 className="display-4 text-white">28°C</h1>
+                            <h1 className="display-4 text-white">{city.temp}°C</h1>
                         </div>
                     </div>
                     <div className="foot py-4">
+                      
                         <div className="foo_head">
                             <h4 className="text-center">Wednesday, 12:00 PM</h4>
                         </div>
@@ -60,24 +78,26 @@ function App() {
                                 <tbody>
                                   <tr>
                                     <th scope="row">Humidity</th>
-                                    <td>63%</td>
+                                    <td>{city.humidity}%</td>
                                 </tr>
                                 <tr>
                                     <th scope="row">Pressure</th>
-                                    <td>1015 mb</td>
+                                    <td>{city.pressure} mb</td>
                                 </tr>
                                   <tr>
                                     <th scope="row">Visibility</th> 
-                                    <td>1.6 km</td>
+                                    <td>{weather.visibility} km</td>
                                 </tr>
                                 <tr>
                                     <th scope="row">Wind</th>
-                                    <td>ENE 3 km/h</td>
+                                    <td>{wind.speed} 3 km/h</td>
                                 </tr>
                                 </tbody>
                               </table>
                         </div>
                     </div>
+                    </div>
+                )}
                 </div>
             </div>
         </div>
